@@ -11,6 +11,7 @@
 
 unsigned AnimationDelay = 5;
 unsigned AnimationDelayCount = 0;
+unsigned Health = 50;
 int playerIndex = 0;
 bool IsFacingRight = 1;
 
@@ -19,9 +20,12 @@ Vector2 opponentPos = { SCREENWIDTH, SCREENHEIGHT - CellHeight };
 
 Texture2D spritePlayer;
 Texture2D spriteOpponent;
+Texture2D healthBar;
+Texture2D healthBarHalf;
 
 Rectangle source = (Rectangle{ 0, 0, 250, 250 });
 Rectangle sourceL = (Rectangle{ 0, 250, 250, 250 });
+Rectangle sourceH = (Rectangle{ 0, 0, 300, 150 });
 
 void GAMEOVER()
 {
@@ -48,6 +52,8 @@ int main()
 	PlayMusicStream(music);
 	SetTargetFPS(60);
 	spritePlayer = LoadTexture("assets/person2.png");
+	healthBar = LoadTexture("assets/healthbarfull.png");
+	healthBarHalf = LoadTexture("assets/healthbarhalf.png");
 	while (WindowShouldClose() == 0)
 	{
 		UpdateMusicStream(music);
@@ -108,8 +114,15 @@ int main()
 		DrawTextureRec(spritePlayer, source, playerPos, WHITE);
 		if (!IsFacingRight)
 		DrawTextureRec(spritePlayer, sourceL, playerPos, WHITE);
+		if (Health == 100)
+		DrawTextureRec(healthBar, sourceH, (Vector2{ 0, 0 }), WHITE);
+		if (Health == 50)
+			DrawTextureRec(healthBarHalf, sourceH, (Vector2{ 0, 0 }), WHITE);
 		if (playerPos.x == opponentPos.x && playerPos.y == opponentPos.y)
 			break;
+			//Health -= 50;
+		const char* cHealth = TextFormat("%d", Health);
+		DrawText(cHealth, 115, 50, 50, BLACK);
 		EndDrawing();
 	}
 	GAMEOVER();
