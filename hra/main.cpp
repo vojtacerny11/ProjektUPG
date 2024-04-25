@@ -13,7 +13,7 @@ unsigned short AnimationDelay = 5;
 unsigned short AnimationDelayCount = 0;
 unsigned short NotMoving = 40;
 unsigned short NotMovingCount = 0;
-unsigned short Health = 100;
+unsigned short Health = 0;
 unsigned short fallVelocity = 15;
 int playerIndex = 0;
 bool IsFacingRight = 1;
@@ -27,10 +27,13 @@ Texture2D spritePlayer;
 Texture2D spriteOpponent;
 Texture2D floorSprite;
 Texture2D hearts;
+Texture2D heartHalf;
+Texture2D heartPrazdne;
 
 Rectangle source = (Rectangle{ 0, 0, 250, 250 });
 Rectangle sourceL = (Rectangle{ 0, 250, 250, 250 });
-Rectangle sourceH = (Rectangle{ 0, 0, 300, 100 });
+Rectangle sourceH = (Rectangle{ 0, 0, 150, 70 });
+Rectangle sourceHh = (Rectangle{ 0, 0, 50, 70 });
 Rectangle FloorRec = (Rectangle{ 0, 0, 2000, 50 });
 
 void GAMEOVER()
@@ -53,12 +56,16 @@ int main()
 	InitAudioDevice();
 	Music music = LoadMusicStream("audio/Night.mp3");
 	Sound step = LoadSound("audio/step.wav");
+	Sound death = LoadSound("audio/death.wav");
 	SetSoundVolume(step, 0.25f);
+	SetSoundVolume(death, 0.5f);
 	SetMusicVolume(music, 0.5f);
 	PlayMusicStream(music);
 	SetTargetFPS(60);
 	spritePlayer = LoadTexture("assets/person2.png");
 	hearts = LoadTexture("assets/hearts.png");
+	heartHalf = LoadTexture("assets/heart_half.png");
+	heartPrazdne = LoadTexture("assets/heart_prazdne.png");
 	floorSprite = LoadTexture("assets/floor1.png");
 	while (WindowShouldClose() == 0)
 	{
@@ -117,10 +124,6 @@ int main()
 			playerPos.y += CellHeight;
 			IsFalling = 1;
 			NotMovingCount = 0;
-			if (playerPos.y > SCREENHEIGHT - CellHeight)
-			{
-				playerPos.y -= CellHeight;
-			}
 		}
 		if (!IsFalling)
 		{
@@ -139,8 +142,10 @@ int main()
 		if (IsFalling)
 		{
 			playerPos.y += fallVelocity;
-			if (playerPos.y > SCREENHEIGHT - CellHeight)
+			if (playerPos.y > SCREENHEIGHT - CellHeight) {
 				IsFalling = 0;
+				playerPos.y = SCREENHEIGHT - CellHeight;
+			}
 		}
 		ClearBackground(RAYWHITE);
 		DrawTextureRec(floorSprite, FloorRec, (Vector2{ 0, SCREENHEIGHT - 50 }), WHITE);
@@ -148,18 +153,35 @@ int main()
 		DrawTextureRec(spritePlayer, source, playerPos, WHITE);
 		if (!IsFacingRight)
 		DrawTextureRec(spritePlayer, sourceL, playerPos, WHITE);
-		DrawTextureRec(hearts, sourceH, (Vector2{ 0, 0 }), WHITE);
-		if (Health == 67) {
-			sourceH = (Rectangle{ 0, 0, 200, 100 });
+		DrawTextureRec(hearts, sourceH, (Vector2{ 20, 0 }), WHITE);
+		if (Health == 83) {
+			sourceH = (Rectangle{ 0, 0, 100, 70 });
+			DrawTextureRec(heartHalf, sourceHh, (Vector2{ 120, 3 }), WHITE);
 		}
-		if (Health == 34) {
-			sourceH = (Rectangle{ 0, 0, 100, 100 });
+		else if (Health == 66)
+		{
+			DrawTextureRec(heartPrazdne, sourceHh, (Vector2{ 120, 2 }), WHITE);
 		}
-		if (Health < 34) {
+		else if (Health == 49)
+		{
+			sourceH = (Rectangle{ 0, 0, 50, 70 });
+			DrawTextureRec(heartPrazdne, sourceHh, (Vector2{ 120, 2 }), WHITE);
+			DrawTextureRec(heartHalf, sourceHh, (Vector2{ 70, 3 }), WHITE);
+		}
+		else if (Health == 32) {
+			DrawTextureRec(heartPrazdne, sourceHh, (Vector2{ 70, 2 }), WHITE);
+			DrawTextureRec(heartPrazdne, sourceHh, (Vector2{ 120, 2 }), WHITE);
+		}
+		if (Health == 15) {
+			DrawTextureRec(heartHalf, sourceHh, (Vector2{ 20, 3 }), WHITE);
+			DrawTextureRec(heartPrazdne, sourceHh, (Vector2{ 70, 2 }), WHITE);
+			DrawTextureRec(heartPrazdne, sourceHh, (Vector2{ 120, 2 }), WHITE);
+		}
+		if (Health < 15)
+			PlaySound(death);
 			break;
-		}
 		if (playerPos.x == opponentPos.x && playerPos.y == opponentPos.y)
-			Health -= 33;
+			Health -= 17;
 		EndDrawing();
 	}
 	GAMEOVER();
