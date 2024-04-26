@@ -13,12 +13,15 @@ unsigned short AnimationDelay = 5;
 unsigned short AnimationDelayCount = 0;
 unsigned short NotMoving = 40;
 unsigned short NotMovingCount = 0;
+unsigned short ShotDuration = 30;
+unsigned short ShotDurationCount = 0;
 unsigned short Health = 100;
-unsigned short fallVelocity = 15;
-int playerIndex = 0;
+unsigned short fallVelocity = 13;
+short playerIndex = 0;
+short shotIndex = 0;
 bool IsFacingRight = 1;
 bool IsFalling = 0;
-
+bool IsShooting = 0;
 
 Vector2 playerPos = { 100, SCREENHEIGHT - CellHeight - 50};
 Vector2 opponentPos = { SCREENWIDTH, SCREENHEIGHT - CellHeight };
@@ -30,12 +33,21 @@ Texture2D floorSprite;
 Texture2D hearts;
 Texture2D heartHalf;
 Texture2D heartPrazdne;
+Texture2D spriteJumpR;
+Texture2D spriteJumpL;
+Texture2D spriteShoot;
+Texture2D spriteShoot2;
 
 Rectangle source = (Rectangle{ 0, 0, CellHeight, CellWidth });
 Rectangle sourceL = (Rectangle{ 0, 0, CellHeight, CellWidth });
 Rectangle sourceH = (Rectangle{ 0, 0, 150, 70 });
 Rectangle sourceHh = (Rectangle{ 0, 0, 50, 70 });
 Rectangle FloorRec = (Rectangle{ 0, 0, 2000, 50 });
+Rectangle sourceJump = (Rectangle{ 0, 0, CellWidth, 150 });
+
+Sound step;
+Sound gunshot;
+Sound hit;
 
 void GAMEOVER()
 {
@@ -51,15 +63,18 @@ void GAMEOVER()
 	}
 }
 
+void UpdatePlayer();
+void UpdateHealth();
+
 int main()
 {
 	InitWindow(SCREENWIDTH, SCREENHEIGHT, "2DSHOOTER");
 	InitAudioDevice();
 	Music music = LoadMusicStream("audio/Night.mp3");
-	Sound step = LoadSound("audio/step.wav");
 	Sound death = LoadSound("audio/death.wav");
-	Sound hit = LoadSound("audio/hit.wav");
-	Sound gunshot = LoadSound("audio/gunshot.mp3");
+	hit = LoadSound("audio/hit.wav");
+	step = LoadSound("audio/step.wav");
+	gunshot = LoadSound("audio/gunshot.mp3");
 	SetSoundVolume(step, 0.35f);
 	SetSoundVolume(death, 0.5f);
 	SetSoundVolume(hit, 0.5f);
@@ -73,122 +88,52 @@ int main()
 	heartHalf = LoadTexture("assets/heart_half.png");
 	heartPrazdne = LoadTexture("assets/heart_prazdne.png");
 	floorSprite = LoadTexture("assets/floor1.png");
+	spriteJumpR = LoadTexture("assets/spriteJump.png");
+	spriteJumpL = LoadTexture("assets/spriteJump2.png");
+	spriteShoot = LoadTexture("assets/spriteShooting.png");
+	spriteShoot2 = LoadTexture("assets/spriteShooting2.png");
 	while (WindowShouldClose() == 0)
 	{
 		UpdateMusicStream(music);
+		++ShotDurationCount;
 		++AnimationDelayCount;
 		NotMovingCount++;
-		if (NotMovingCount > NotMoving)
-		{
-			if (IsFacingRight)
-				source.x = 0, 0;
-			else
-				sourceL.x = 200, 0;
-		}
-		if (NotMovingCount < NotMoving)
-		{
-			if (AnimationDelayCount > AnimationDelay)
-			{
-				AnimationDelayCount = 0;
-				++playerIndex;
-				if (playerIndex == 3)
-					playerIndex = 0;
-				if (IsFacingRight)
-					source.x = (float)CellWidth * (float)playerIndex;
-				if (!IsFacingRight)
-					sourceL.x = (float)CellWidth * (float)playerIndex;
-			}
-		}
+
 		BeginDrawing();
-		if (IsKeyPressed(KEY_D) || IsKeyPressed(KEY_RIGHT))
-		{
-			if (!IsFalling)
-				PlaySound(step);
-			playerPos.x += CellWidth;
-			IsFalling = 1;
-			NotMovingCount = 0;
-			if (playerPos.x > SCREENWIDTH - CellWidth)
-			{
-				playerPos.x = 0;
-			}
-			IsFacingRight = 1;
-		}
-		if (IsKeyPressed(KEY_A) || IsKeyPressed(KEY_LEFT))
-		{
-			if (!IsFalling)
-				PlaySound(step);
-			playerPos.x -= CellWidth;
-			IsFalling = 1;
-			NotMovingCount = 0;
-			if (playerPos.x < 0)
-			{
-				playerPos.x += CellWidth;
-			}
-			IsFacingRight = 0;
-		}
-		if (!IsFalling)
-		{
-			if (IsKeyPressed(KEY_W) || IsKeyPressed(KEY_UP))
-			{
-				playerPos.y -= 2 * CellHeight;
-				IsFalling = 1;
-				NotMovingCount = 0;
-				if (playerPos.y < 0)
-				{
-					playerPos.y += CellHeight;
-				}
-			}
-		}
-		if (IsKeyPressed(KEY_SPACE))
-		{
-			PlaySound(gunshot);
-		}
-		if (IsFalling)
-		{
-			playerPos.y += fallVelocity;
-			if (playerPos.y > SCREENHEIGHT - CellHeight - 50) {
-				IsFalling = 0;
-				PlaySound(step);
-				playerPos.y = SCREENHEIGHT - CellHeight - 50;
-			}
-		}
+
+		UpdatePlayer();
+		
 		ClearBackground(RAYWHITE);
 		DrawTextureRec(floorSprite, FloorRec, (Vector2{ 0, SCREENHEIGHT - 50 }), WHITE);
-		if (IsFacingRight)
-		DrawTextureRec(spritePlayerR, source, playerPos, WHITE);
-		if (!IsFacingRight)
-		DrawTextureRec(spritePlayerL, sourceL, playerPos, WHITE);
+		if (IsShooting && IsFacingRight)
+		{
+			if (ShotDuration > ShotDurationCount)
+				DrawTextureRec(spriteShoot, source, playerPos, WHITE);
+			else
+				IsShooting = 0;
+		}
+		else if (IsShooting && !IsFacingRight)
+		{
+			if (ShotDuration > ShotDurationCount)
+				DrawTextureRec(spriteShoot2, source, playerPos, WHITE);
+			else
+				IsShooting = 0;
+		}
+		else if (IsFacingRight && IsFalling)
+			DrawTextureRec(spriteJumpR, sourceJump, playerPos, WHITE);
+		else if (!IsFacingRight && IsFalling)
+			DrawTextureRec(spriteJumpL, sourceJump, playerPos, WHITE);
+		else if (IsFacingRight && IsFalling == 0)
+			DrawTextureRec(spritePlayerR, source, playerPos, WHITE);
+		else if (!IsFacingRight && IsFalling == 0)
+			DrawTextureRec(spritePlayerL, sourceL, playerPos, WHITE);
+
+		UpdateHealth();
+
 		DrawTextureRec(hearts, sourceH, (Vector2{ 20, 0 }), WHITE);
-		if (Health == 83) {
-			sourceH = (Rectangle{ 0, 0, 100, 70 });
-			DrawTextureRec(heartHalf, sourceHh, (Vector2{ 120, 3 }), WHITE);
-		}
-		else if (Health == 66)
-		{
-			DrawTextureRec(heartPrazdne, sourceHh, (Vector2{ 120, 2 }), WHITE);
-		}
-		else if (Health == 49)
-		{
-			sourceH = (Rectangle{ 0, 0, 50, 70 });
-			DrawTextureRec(heartPrazdne, sourceHh, (Vector2{ 120, 2 }), WHITE);
-			DrawTextureRec(heartHalf, sourceHh, (Vector2{ 70, 3 }), WHITE);
-		}
-		else if (Health == 32) {
-			DrawTextureRec(heartPrazdne, sourceHh, (Vector2{ 70, 2 }), WHITE);
-			DrawTextureRec(heartPrazdne, sourceHh, (Vector2{ 120, 2 }), WHITE);
-		}
-		if (Health == 15) {
-			DrawTextureRec(heartHalf, sourceHh, (Vector2{ 20, 3 }), WHITE);
-			DrawTextureRec(heartPrazdne, sourceHh, (Vector2{ 70, 2 }), WHITE);
-			DrawTextureRec(heartPrazdne, sourceHh, (Vector2{ 120, 2 }), WHITE);
-		}
 		if (Health < 15) {
 			PlaySound(death);
 			break;
-		}
-		if (playerPos.x == opponentPos.x && playerPos.y == opponentPos.y) {
-			Health -= 17;
-			PlaySound(hit);
 		}
 		EndDrawing();
 	}
@@ -199,4 +144,116 @@ int main()
 	CloseWindow();
 
 	return 0;
+}
+
+void UpdatePlayer()
+{
+	if (NotMovingCount > NotMoving)
+	{
+		if (IsFacingRight)
+			source.x = 0, 0;
+		else
+			sourceL.x = 200, 0;
+	}
+	if (NotMovingCount < NotMoving && IsFalling == 0)
+	{
+		if (AnimationDelayCount > AnimationDelay)
+		{
+			AnimationDelayCount = 0;
+			++playerIndex;
+			if (playerIndex == 3)
+				playerIndex = 0;
+			if (IsFacingRight)
+				source.x = (float)CellWidth * (float)playerIndex;
+			if (!IsFacingRight)
+				sourceL.x = (float)CellWidth * (float)playerIndex;
+		}
+	}
+	if (IsKeyPressed(KEY_D) || IsKeyPressed(KEY_RIGHT))
+	{
+		if (!IsFalling)
+			PlaySound(step);
+		playerPos.x += CellWidth;
+		IsFalling = 1;
+		NotMovingCount = 0;
+		if (playerPos.x > SCREENWIDTH - CellWidth)
+		{
+			playerPos.x = 0;
+		}
+		IsFacingRight = 1;
+	}
+	if (IsKeyPressed(KEY_A) || IsKeyPressed(KEY_LEFT))
+	{
+		if (!IsFalling)
+			PlaySound(step);
+		playerPos.x -= CellWidth;
+		IsFalling = 1;
+		NotMovingCount = 0;
+		if (playerPos.x < 0)
+		{
+			playerPos.x += CellWidth;
+		}
+		IsFacingRight = 0;
+	}
+	if (!IsFalling)
+	{
+		if (IsKeyPressed(KEY_W) || IsKeyPressed(KEY_UP))
+		{
+			playerPos.y -= 2 * CellHeight;
+			IsFalling = 1;
+			if (playerPos.y < 0)
+			{
+				playerPos.y += CellHeight;
+			}
+		}
+	}
+	if (IsKeyPressed(KEY_SPACE))
+	{
+		ShotDurationCount = 0;
+		IsShooting = 1;
+		PlaySound(gunshot);
+	}
+	if (IsFalling)
+	{
+		playerPos.y += fallVelocity;
+		if (playerPos.y > SCREENHEIGHT - CellHeight - 50) {
+			IsFalling = 0;
+			PlaySound(step);
+			playerPos.y = SCREENHEIGHT - CellHeight - 50;
+		}
+	}
+}
+
+void UpdateHealth()
+{
+		if (Health == 83) {
+		sourceH = (Rectangle{ 0, 0, 100, 70 });
+		DrawTextureRec(heartHalf, sourceHh, (Vector2{ 120, 3 }), WHITE);
+		}
+		else if (Health == 66)
+		{
+			sourceH = (Rectangle{ 0, 0, 100, 70 });
+			DrawTextureRec(heartPrazdne, sourceHh, (Vector2{ 120, 2 }), WHITE);
+		}
+		else if (Health == 49)
+		{
+			sourceH = (Rectangle{ 0, 0, 50, 70 });
+			DrawTextureRec(heartPrazdne, sourceHh, (Vector2{ 120, 2 }), WHITE);
+			DrawTextureRec(heartHalf, sourceHh, (Vector2{ 70, 3 }), WHITE);
+		}
+		else if (Health == 32) {
+			sourceH = (Rectangle{ 0, 0, 50, 70 });
+			DrawTextureRec(heartPrazdne, sourceHh, (Vector2{ 70, 2 }), WHITE);
+			DrawTextureRec(heartPrazdne, sourceHh, (Vector2{ 120, 2 }), WHITE);
+		}
+		if (Health == 15) {
+			sourceH = (Rectangle{ 0, 0, 0, 70 });
+			DrawTextureRec(heartHalf, sourceHh, (Vector2{ 20, 3 }), WHITE);
+			DrawTextureRec(heartPrazdne, sourceHh, (Vector2{ 70, 2 }), WHITE);
+			DrawTextureRec(heartPrazdne, sourceHh, (Vector2{ 120, 2 }), WHITE);
+		}
+		if (playerPos.x == opponentPos.x && playerPos.y == opponentPos.y) {
+			Health -= 17;
+			PlaySound(hit);
+		}
 }
