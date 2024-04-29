@@ -33,18 +33,22 @@ unsigned short rollIndex = 0;
 unsigned short movementCount = 0;
 const unsigned short movementDelay = 4; //movement neni moc rychly ani pomaly muzem si jeste pohrat 
 
-unsigned short screenPassed = 9;
+unsigned short screenPassed = 0;
 
 bool IsFacingRight = 1;
 bool IsFalling = 0;
 bool IsShooting = 0;
 bool IsCactusFriendly = 0;
+bool ShotPassed = 0;
 
-Vector2 playerPos = { 100, SCREENHEIGHT - CellHeight - 50};
+Vector2 playerPos = { 100, SCREENHEIGHT - CellHeight - 50 };
 Vector2 enemyPos = { SCREENWIDTH, SCREENHEIGHT - CellHeight - 50 };
 Vector2 BushPos = { 0, SCREENHEIGHT - CellHeight };
 Vector2 cactusPos = { SCREENWIDTH - CellHeight * 3, SCREENHEIGHT - CellHeight - 100 };
+Vector2 bulletPos = { 200, SCREENHEIGHT - CellHeight - 50 };
+Vector2 bullet2Pos = { 100, SCREENHEIGHT - CellHeight - 50 };
 
+Texture2D pozadi;
 Texture2D spritePlayerR;
 Texture2D spritePlayerL;
 Texture2D spriteOpponent;
@@ -61,6 +65,8 @@ Texture2D enemyL;
 Texture2D enemyR;
 Texture2D cactus;
 Texture2D salon;
+Texture2D bullet;
+Texture2D bullet2;
 
 Rectangle source = (Rectangle{ 0, 0, CellHeight, CellWidth });
 Rectangle sourceL = (Rectangle{ 0, 0, CellHeight, CellWidth });
@@ -71,6 +77,7 @@ Rectangle sourceJump = (Rectangle{ 0, 0, CellWidth, 150 });
 Rectangle BushRec = (Rectangle{ 0, 0, CellWidth / 2, CellHeight / 2 });
 Rectangle cactusRec = (Rectangle{ 0, 0, CellWidth, CellHeight + 50 });
 Rectangle salonRec = (Rectangle{ 0, 0, 2 * CellWidth, 2 * CellHeight });
+Rectangle bulletRec = (Rectangle{ 0, 0, CellWidth, CellHeight });
 
 Sound step;
 Sound gunshot;
@@ -130,6 +137,7 @@ int main()
 	SetMusicVolume(music, 0.5f);
 	PlayMusicStream(music);
 	SetTargetFPS(60);
+	pozadi = LoadTexture("assets/pozadi.png");
 	spritePlayerR = LoadTexture("assets/sprite.png");
 	spritePlayerL = LoadTexture("assets/sprite2.png");
 	hearts = LoadTexture("assets/hearts.png");
@@ -145,6 +153,8 @@ int main()
 	enemyL = LoadTexture("assets/sprite_enemy2.png");
 	cactus = LoadTexture("assets/cactuslowquality.png");
 	salon = LoadTexture("assets/salon.png");
+	bullet = LoadTexture("assets/bullet.png");
+	bullet2 = LoadTexture("assets/bullet2.png");
 	while (WindowShouldClose() == 0)
 	{
 		UpdateMusicStream(music);
@@ -180,8 +190,8 @@ int main()
 
 		if (IsKeyPressed(KEY_U))
 			SetMusicVolume(music, 0.5f);
+		DrawTexture(pozadi, 0, 0, WHITE);
 
-		ClearBackground(WHITE);
 		DrawTextureRec(floorSprite, FloorRec, (Vector2{ 0, SCREENHEIGHT - 50 }), WHITE);
 
 		DrawTextureRec(cactus, cactusRec, cactusPos, WHITE);
@@ -195,13 +205,35 @@ int main()
 		{
 			if (IsFacingRight) {
 				if (ShotDuration > ShotDurationCount)
+				{
 					DrawTextureRec(spriteShoot, source, playerPos, WHITE);
+					if (!ShotPassed) {
+						DrawTextureRec(bullet, bulletRec, bulletPos, WHITE);
+						bulletPos.x += CellWidth;
+					}
+					if (bulletPos.x > SCREENWIDTH - CellWidth)
+					{
+						bulletPos.x = playerPos.x + CellWidth;
+						ShotPassed = 1;
+					}
+				}
 				else
 					IsShooting = 0;
 			}
 			if (!IsFacingRight) {
 				if (ShotDuration > ShotDurationCount)
+				{
 					DrawTextureRec(spriteShoot2, source, playerPos, WHITE);
+					if (!ShotPassed) {
+						DrawTextureRec(bullet2, bulletRec, bullet2Pos, WHITE);
+						bullet2Pos.x -= CellWidth;
+					}
+					if (bullet2Pos.x < 0)
+					{
+						bullet2Pos.x = playerPos.x - CellWidth;
+						ShotPassed = 1;
+					}
+				}
 				else
 					IsShooting = 0;
 			}
@@ -230,7 +262,7 @@ int main()
 	}
 	if (screenPassed < 10)
 		GAMEOVER();
-		FINISH();
+	FINISH();
 	CloseAudioDevice();
 
 	CloseWindow();
@@ -268,6 +300,8 @@ void UpdatePlayer()
 			if (!IsFalling)
 				PlaySound(step);
 			playerPos.x += CellWidth;
+			bulletPos.x += CellWidth;
+			bullet2Pos.x += CellWidth;
 			IsFalling = 1;
 			NotMovingCount = 0;
 			if (playerPos.x > SCREENWIDTH - CellWidth)
@@ -288,6 +322,8 @@ void UpdatePlayer()
 			if (!IsFalling)
 				PlaySound(step);
 			playerPos.x -= CellWidth;
+			bulletPos.x -= CellWidth;
+			bullet2Pos.x -= CellWidth;
 			IsFalling = 1;
 			NotMovingCount = 0;
 			if (playerPos.x < 0)
@@ -300,7 +336,7 @@ void UpdatePlayer()
 	switch (IsFalling)
 	{
 	case 0:
-		if (IsKeyPressed(KEY_W) || IsKeyDown(KEY_UP))
+		if (IsKeyDown(KEY_W) || IsKeyDown(KEY_UP))
 		{
 			playerPos.y -= 3 * CellHeight;
 			IsFalling = 1;
@@ -309,6 +345,7 @@ void UpdatePlayer()
 		{
 			ShotDurationCount = 0;
 			IsShooting = 1;
+			ShotPassed = 0;
 			PlaySound(gunshot);
 		}
 		break;
@@ -326,30 +363,30 @@ void UpdatePlayer()
 void UpdateHealth()
 {
 	switch (Health) {
-		case 83:
-			sourceH = (Rectangle{ 0, 0, 100, 70 });
-			DrawTextureRec(heartHalf, sourceHh, (Vector2{ 120, 3 }), WHITE);
-			break;
-		case 66:
-			sourceH = (Rectangle{ 0, 0, 100, 70 });
-			DrawTextureRec(heartPrazdne, sourceHh, (Vector2{ 120, 2 }), WHITE);
-			break;
-		case 49:
-			sourceH = (Rectangle{ 0, 0, 50, 70 });
-			DrawTextureRec(heartPrazdne, sourceHh, (Vector2{ 120, 2 }), WHITE);
-			DrawTextureRec(heartHalf, sourceHh, (Vector2{ 70, 3 }), WHITE);
-			break;
-		case 32:
-			sourceH = (Rectangle{ 0, 0, 50, 70 });
-			DrawTextureRec(heartPrazdne, sourceHh, (Vector2{ 70, 2 }), WHITE);
-			DrawTextureRec(heartPrazdne, sourceHh, (Vector2{ 120, 2 }), WHITE);
-			break;
-		case 15:
-			sourceH = (Rectangle{ 0, 0, 0, 70 });
-			DrawTextureRec(heartHalf, sourceHh, (Vector2{ 20, 3 }), WHITE);
-			DrawTextureRec(heartPrazdne, sourceHh, (Vector2{ 70, 2 }), WHITE);
-			DrawTextureRec(heartPrazdne, sourceHh, (Vector2{ 120, 2 }), WHITE);
-			break;
+	case 83:
+		sourceH = (Rectangle{ 0, 0, 100, 70 });
+		DrawTextureRec(heartHalf, sourceHh, (Vector2{ 120, 3 }), WHITE);
+		break;
+	case 66:
+		sourceH = (Rectangle{ 0, 0, 100, 70 });
+		DrawTextureRec(heartPrazdne, sourceHh, (Vector2{ 120, 2 }), WHITE);
+		break;
+	case 49:
+		sourceH = (Rectangle{ 0, 0, 50, 70 });
+		DrawTextureRec(heartPrazdne, sourceHh, (Vector2{ 120, 2 }), WHITE);
+		DrawTextureRec(heartHalf, sourceHh, (Vector2{ 70, 3 }), WHITE);
+		break;
+	case 32:
+		sourceH = (Rectangle{ 0, 0, 50, 70 });
+		DrawTextureRec(heartPrazdne, sourceHh, (Vector2{ 70, 2 }), WHITE);
+		DrawTextureRec(heartPrazdne, sourceHh, (Vector2{ 120, 2 }), WHITE);
+		break;
+	case 15:
+		sourceH = (Rectangle{ 0, 0, 0, 70 });
+		DrawTextureRec(heartHalf, sourceHh, (Vector2{ 20, 3 }), WHITE);
+		DrawTextureRec(heartPrazdne, sourceHh, (Vector2{ 70, 2 }), WHITE);
+		DrawTextureRec(heartPrazdne, sourceHh, (Vector2{ 120, 2 }), WHITE);
+		break;
 	}
 	if (playerPos.x == enemyPos.x && playerPos.y == enemyPos.y) {
 		Health -= 17;
