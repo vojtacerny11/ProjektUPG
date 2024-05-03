@@ -41,6 +41,29 @@ bool IsShooting = 0;
 bool IsCactusFriendly = 0;
 bool ShotPassed = 0;
 
+const short worldHeight = 18;
+const short worldWidth = 32;
+
+int World[worldHeight][worldWidth] = {
+	{ 0,  0,  0, 0, 0,  0,  0, 0, 0,  0,  0, 0, 0,  0,  0,  0, 0,  0,  0, 0, 0,  0,  0, 0, 0,  0,  0, 0, 0,  0,  0, 0},
+	{ 0,  0,  0, 0, 0,  0,  0, 0, 0,  0,  0, 0, 0,  0,  0,  0, 0,  0,  0, 0, 0,  0,  0, 0, 0,  0,  0, 0, 0,  0,  0, 0},
+	{ 0,  0,  0, 0, 0,  0,  0, 0, 0,  0,  0, 0, 0,  0,  0,  0, 0,  0,  0, 0, 0,  0,  0, 0, 0,  0,  0, 0, 0,  0,  0, 0},
+	{ 0,  0,  0, 0, 0,  0,  0, 0, 0,  0,  0, 0, 0,  0,  0,  0, 0,  0,  0, 0, 0,  0,  0, 0, 0,  0,  0, 0, 0,  0,  0, 0},
+	{ 0,  0,  0, 0, 0,  0,  0, 0, 0,  0,  0, 0, 0,  0,  0,  0, 0,  0,  0, 0, 0,  0,  0, 0, 0,  0,  0, 0, 0,  0,  0, 0},
+	{ 0,  0,  0, 0, 0,  0,  0, 0, 0,  0,  0, 0, 0,  0,  0,  0, 0,  0,  0, 0, 0,  0,  0, 0, 0,  0,  0, 0, 0,  0,  0, 0},
+	{ 0,  0,  0, 0, 0,  0,  0, 0, 0,  0,  0, 0, 0,  0,  0,  0, 0,  0,  0, 0, 0,  0,  0, 0, 0,  0,  0, 0, 0,  0,  0, 0},
+	{ 0,  0,  0, 0, 0,  0,  0, 0, 0,  0,  0, 0, 0,  0,  0,  0, 0,  0,  0, 0, 0,  0,  0, 0, 0,  0,  0, 0, 0,  0,  0, 0},
+	{ 0,  0,  0, 0, 0,  0,  0, 0, 0,  0,  0, 0, 0,  0,  0,  0, 0,  0,  0, 0, 0,  0,  0, 0, 0,  0,  0, 0, 0,  0,  0, 0},
+	{ 0,  0,  0, 0, 0,  0,  0, 0, 0,  0,  0, 0, 0,  0,  0,  0, 0,  0,  0, 0, 0,  0,  0, 0, 0,  0,  0, 0, 0,  0,  0, 0},
+	{ 0,  0,  0, 0, 0,  0,  0, 0, 0,  0,  0, 0, 0,  0,  1,  1, 0,  0,  0, 0, 0,  0,  0, 0, 0,  0,  0, 0, 0,  0,  0, 0},
+	{ 0,  0,  0, 0, 0,  0,  0, 0, 0,  0,  0, 0, 0,  0,  0,  0, 0,  0,  0, 0, 0,  0,  0, 0, 0,  0,  0, 0, 0,  0,  0, 0},
+	{ 0,  0,  0, 0, 0,  0,  0, 1, 1,  0,  0, 1, 1,  0,  0,  0, 0,  0,  0, 0, 0,  0,  0, 0, 0,  0,  0, 0, 0,  0,  0, 0},
+	{ 0,  0,  0, 0, 0,  0,  0, 0, 0,  0,  0, 0, 0,  0,  0,  0, 0,  0,  0, 0, 0,  0,  0, 0, 0,  0,  0, 0, 0,  0,  0, 0},
+	{ 0,  0,  0, 0, 1,  1,  0, 0, 0,  0,  0, 0, 0,  0,  0,  0, 0,  0,  0, 0, 0,  0,  0, 0, 0,  0,  0, 0, 0,  0,  0, 0},
+	{ 0,  0,  0, 0, 0,  0,  0, 0, 0,  0,  0, 0, 0,  0,  0,  0, 0,  0,  0, 0, 0,  0,  0, 0, 0,  0,  0, 0, 0,  0,  0, 0},
+	{ 0,  0,  0, 0, 0,  0,  0, 0, 0,  0,  0, 0, 0,  0,  0,  0, 0,  0,  0, 0, 0,  0,  0, 0, 0,  0,  0, 0, 0,  0,  0, 0},
+};
+
 Vector2 playerPos = { 100, SCREENHEIGHT - CellHeight - 50 };
 Vector2 enemyPos = { SCREENWIDTH, SCREENHEIGHT - CellHeight - 50 };
 Vector2 BushPos = { 0, SCREENHEIGHT - CellHeight };
@@ -67,6 +90,7 @@ Texture2D cactus;
 Texture2D salon;
 Texture2D bullet;
 Texture2D bullet2;
+Texture2D plank;
 
 Rectangle source = (Rectangle{ 0, 0, CellHeight, CellWidth });
 Rectangle sourceL = (Rectangle{ 0, 0, CellHeight, CellWidth });
@@ -78,6 +102,8 @@ Rectangle BushRec = (Rectangle{ 0, 0, CellWidth / 2, CellHeight / 2 });
 Rectangle cactusRec = (Rectangle{ 0, 0, CellWidth, CellHeight + 50 });
 Rectangle salonRec = (Rectangle{ 0, 0, 2 * CellWidth, 2 * CellHeight });
 Rectangle bulletRec = (Rectangle{ 0, 0, CellWidth, CellHeight });
+Rectangle plankRec = (Rectangle{ 0, 0, 50, 50 });
+
 
 Sound step;
 Sound gunshot;
@@ -120,6 +146,12 @@ void FINISH()
 void UpdatePlayer();
 void UpdateHealth();
 
+int GetTile();
+
+void CheckPlatform();
+
+void drawPlatform();
+
 int main()
 {
 	InitWindow(SCREENWIDTH, SCREENHEIGHT, "2DWESTERN");
@@ -155,6 +187,7 @@ int main()
 	salon = LoadTexture("assets/salon.png");
 	bullet = LoadTexture("assets/bullet.png");
 	bullet2 = LoadTexture("assets/bullet2.png");
+	plank = LoadTexture("assets/plank.png");
 	while (WindowShouldClose() == 0)
 	{
 		UpdateMusicStream(music);
@@ -191,6 +224,10 @@ int main()
 		if (IsKeyPressed(KEY_U))
 			SetMusicVolume(music, 0.5f);
 		DrawTexture(pozadi, 0, 0, WHITE);
+
+		drawPlatform();
+
+		CheckPlatform();
 
 		DrawTextureRec(floorSprite, FloorRec, (Vector2{ 0, SCREENHEIGHT - 50 }), WHITE);
 
@@ -252,6 +289,7 @@ int main()
 		UpdateHealth();
 
 		DrawTextureRec(hearts, sourceH, (Vector2{ 20, 0 }), WHITE);
+
 		if (screenPassed == 10)
 			break;
 		if (Health < 15) {
@@ -396,5 +434,34 @@ void UpdateHealth()
 		Health -= 17;
 		PlaySound(hit);
 		IsCactusFriendly = 1;
+	}
+}
+
+void drawPlatform()
+{
+	for (int row = 0; row < worldHeight; row++)
+		for (int col = 0; col < worldWidth; col++)
+		{
+			if (World[row][col] == 1)
+			{
+				DrawTextureRec(plank, plankRec, (Vector2{ (float)col * CellWidth / 2, (float)row * CellHeight / 2 }), WHITE);
+			}
+		}
+}
+
+int GetTile(unsigned row, unsigned col)
+{
+	return World[col][row];
+}
+
+void CheckPlatform()
+{
+	if (IsFacingRight) {
+		if (GetTile(playerPos.x / 50, playerPos.y / 50 + 2 - (30 / 50)) == 1)
+			IsFalling = 0;
+	}
+	if (!IsFacingRight) {
+		if (GetTile(playerPos.x / 50 + 1, playerPos.y / 50 + 2 - (30 / 50)) == 1)
+			IsFalling = 0;
 	}
 }
