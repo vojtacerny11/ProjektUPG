@@ -11,6 +11,8 @@
 #define CellHeight 100
 #define CellWidth 100
 
+Image icon = LoadImage("assets/cactus.png");
+
 const unsigned short AnimationDelay = 5;
 unsigned short AnimationDelayCount = 0;
 const unsigned short NotMoving = 30;
@@ -52,10 +54,10 @@ int World[worldHeight][worldWidth] = {
 	{ 0,  0,  0, 0, 0,  0,  0, 0, 0,  0,  0, 0, 0,  0,  0,  0, 0,  0,  0, 0, 0,  0,  0, 0, 0,  0,  0, 0, 0,  0,  0, 0},
 	{ 0,  0,  0, 0, 0,  0,  0, 0, 0,  0,  0, 0, 0,  0,  0,  0, 0,  0,  0, 0, 0,  0,  0, 0, 0,  0,  0, 0, 0,  0,  0, 0},
 	{ 0,  0,  0, 0, 0,  0,  0, 0, 0,  0,  0, 0, 0,  0,  0,  0, 0,  0,  0, 0, 0,  0,  0, 0, 0,  0,  0, 0, 0,  0,  0, 0},
-	{ 0,  0,  0, 0, 0,  0,  0, 0, 0,  0,  0, 0, 0,  0,  0,  0, 0,  0,  0, 0, 0,  0,  0, 0, 0,  0,  0, 0, 0,  0,  0, 0},
-	{ 0,  0,  0, 0, 0,  0,  0, 0, 0,  0,  0, 0, 0,  0,  0,  0, 0,  0,  0, 0, 0,  0,  0, 0, 0,  0,  0, 0, 0,  0,  0, 0},
-	{ 0,  0,  0, 0, 0,  0,  0, 0, 0,  0,  0, 0, 0,  0,  0,  0, 0,  0,  0, 0, 0,  0,  0, 0, 0,  0,  0, 0, 0,  0,  0, 0},
-	{ 0,  0,  0, 0, 0,  0,  0, 0, 0,  0,  0, 0, 0,  0,  1,  1, 0,  0,  0, 0, 0,  0,  0, 0, 0,  0,  0, 0, 0,  0,  0, 0},
+	{ 0,  0,  0, 0, 0,  0,  0, 0, 0,  0,  0, 0, 0,  0,  0,  0, 0,  0,  0, 1, 1,  1,  0, 0, 0,  0,  0, 0, 0,  0,  0, 0},
+	{ 0,  0,  0, 0, 0,  0,  0, 0, 0,  0,  0, 0, 0,  0,  0,  0, 1,  1,  0, 0, 0,  0,  0, 0, 0,  0,  0, 0, 0,  0,  0, 1},
+	{ 0,  0,  0, 0, 0,  0,  0, 0, 0,  0,  0, 0, 0,  0,  0,  0, 0,  0,  0, 0, 0,  0,  0, 0, 0,  0,  0, 0, 1,  1,  0, 0},
+	{ 0,  0,  0, 0, 0,  0,  0, 0, 0,  0,  0, 0, 0,  0,  1,  1, 0,  0,  0, 0, 0,  0,  0, 0, 0,  1,  1, 0, 0,  0,  0, 0},
 	{ 0,  0,  0, 0, 0,  0,  0, 0, 0,  0,  0, 0, 0,  0,  0,  0, 0,  0,  0, 0, 0,  0,  0, 0, 0,  0,  0, 0, 0,  0,  0, 0},
 	{ 0,  0,  0, 0, 0,  0,  0, 1, 1,  0,  0, 1, 1,  0,  0,  0, 0,  0,  0, 0, 0,  0,  0, 0, 0,  0,  0, 0, 0,  0,  0, 0},
 	{ 0,  0,  0, 0, 0,  0,  0, 0, 0,  0,  0, 0, 0,  0,  0,  0, 0,  0,  0, 0, 0,  0,  0, 0, 0,  0,  0, 0, 0,  0,  0, 0},
@@ -108,6 +110,53 @@ Rectangle plankRec = (Rectangle{ 0, 0, 50, 50 });
 Sound step;
 Sound gunshot;
 Sound hit;
+Sound MouseClick;
+
+class ButtonPlay
+{
+public:
+	void Draw()
+	{
+		DrawRectangle(SCREENWIDTH / 2 - 75, SCREENHEIGHT / 2 - 75, 150, 50, BLACK);
+		DrawText("PLAY", SCREENWIDTH / 2 - 65, SCREENHEIGHT / 2 - 75, 50, WHITE);
+	}
+};
+
+class ButtonQuit
+{
+public:
+	void Draw()
+	{
+		DrawRectangle(SCREENWIDTH / 2 - 75, SCREENHEIGHT / 2 + 25, 150, 50, BLACK);
+		DrawText("QUIT", SCREENWIDTH / 2 - 60, SCREENHEIGHT / 2 + 25, 50, WHITE);
+	}
+};
+
+class Map1
+{
+public:
+	void Draw()
+	{
+		DrawRectangle(SCREENWIDTH / 2 - 130, SCREENHEIGHT / 2 - 75, 300, 50, BLACK);
+		DrawText("CactusRun", SCREENWIDTH / 2 - 115, SCREENHEIGHT / 2 - 75, 50, WHITE);
+	}
+};
+
+class Map2
+{
+public:
+	void Draw()
+	{
+		DrawRectangle(SCREENWIDTH / 2 - 130, SCREENHEIGHT / 2 + 25, 300, 50, BLACK);
+		DrawText("NightJump", SCREENWIDTH / 2 - 100, SCREENHEIGHT / 2 + 25, 50, WHITE);
+	}
+};
+
+void MainMenu();
+
+void ChooseMap();
+
+void GamePlay();
 
 void GAMEOVER()
 {
@@ -152,160 +201,77 @@ void CheckPlatform();
 
 void drawPlatform();
 
+void resetWorld();
+
 int main()
 {
 	InitWindow(SCREENWIDTH, SCREENHEIGHT, "2DWESTERN");
+	SetWindowIcon(icon);
 	InitAudioDevice();
-	Music music = LoadMusicStream("audio/everet-almond.mp3");
-	//all music rights reserved to everet almond
-	Sound death = LoadSound("audio/death.wav");
-	hit = LoadSound("audio/hit.mp3");
-	step = LoadSound("audio/step.wav");
-	gunshot = LoadSound("audio/gunshot.mp3");
-	SetSoundVolume(step, 0.35f);
-	SetSoundVolume(death, 0.5f);
-	SetSoundVolume(hit, 0.5f);
-	SetSoundVolume(gunshot, 0.5f);
-	SetMusicVolume(music, 0.5f);
-	PlayMusicStream(music);
-	SetTargetFPS(60);
-	pozadi = LoadTexture("assets/pozadi.png");
-	spritePlayerR = LoadTexture("assets/sprite.png");
-	spritePlayerL = LoadTexture("assets/sprite2.png");
-	hearts = LoadTexture("assets/hearts.png");
-	heartHalf = LoadTexture("assets/heart_half.png");
-	heartPrazdne = LoadTexture("assets/heart_prazdne.png");
-	floorSprite = LoadTexture("assets/floor1.png");
-	spriteJumpR = LoadTexture("assets/spriteJump.png");
-	spriteJumpL = LoadTexture("assets/spriteJump2.png");
-	spriteShoot = LoadTexture("assets/spriteShooting.png");
-	spriteShoot2 = LoadTexture("assets/spriteShooting2.png");
-	bush = LoadTexture("assets/RollingBush2.png");
-	enemyR = LoadTexture("assets/sprite_enemy.png");
-	enemyL = LoadTexture("assets/sprite_enemy2.png");
-	cactus = LoadTexture("assets/cactuslowquality.png");
-	salon = LoadTexture("assets/salon.png");
-	bullet = LoadTexture("assets/bullet.png");
-	bullet2 = LoadTexture("assets/bullet2.png");
-	plank = LoadTexture("assets/plank.png");
-	while (WindowShouldClose() == 0)
-	{
-		UpdateMusicStream(music);
-		++ShotDurationCount;
-		++AnimationDelayCount;
-		++BushAnimationDelayCount;
-		NotMovingCount++;
-		movementCount++;
-
-		BeginDrawing();
-
-		if (BushAnimationDelayCount > BushAnimationDelay)
-		{
-			BushAnimationDelayCount = 0;
-			++rollIndex;
-			rollIndex %= 5;
-			BushRec.x = (float)CellWidth / 2 * (float)rollIndex;
-			BushPos.x += CellWidth / 2;
-			if (BushPos.x > SCREENWIDTH - CellWidth)
-			{
-				++BushNotOnScreenCount;
-				if (BushNotOnScreenCount > BushNotOnScreen) {
-					BushNotOnScreenCount = 0;
-					BushPos.x = 0;
-				}
-			}
-		}
-
-		UpdatePlayer();
-
-		if (IsKeyPressed(KEY_M))
-			SetMusicVolume(music, 0.0f);
-
-		if (IsKeyPressed(KEY_U))
-			SetMusicVolume(music, 0.5f);
-		DrawTexture(pozadi, 0, 0, WHITE);
-
-		drawPlatform();
-
-		CheckPlatform();
-
-		DrawTextureRec(floorSprite, FloorRec, (Vector2{ 0, SCREENHEIGHT - 50 }), WHITE);
-
-		DrawTextureRec(cactus, cactusRec, cactusPos, WHITE);
-
-		if (screenPassed == 9) {
-			DrawTextureRec(salon, salonRec, (Vector2{ SCREENWIDTH - CellWidth * 2, SCREENHEIGHT - CellHeight * 2.5 }), WHITE);
-			if (playerPos.x >= SCREENWIDTH - CellWidth && !IsFalling)
-				screenPassed++;
-		}
-		if (IsShooting)
-		{
-			if (IsFacingRight) {
-				if (ShotDuration > ShotDurationCount)
-				{
-					DrawTextureRec(spriteShoot, source, playerPos, WHITE);
-					if (!ShotPassed) {
-						DrawTextureRec(bullet, bulletRec, bulletPos, WHITE);
-						bulletPos.x += CellWidth;
-					}
-					if (bulletPos.x > SCREENWIDTH - CellWidth)
-					{
-						bulletPos.x = playerPos.x + CellWidth;
-						ShotPassed = 1;
-					}
-				}
-				else
-					IsShooting = 0;
-			}
-			if (!IsFacingRight) {
-				if (ShotDuration > ShotDurationCount)
-				{
-					DrawTextureRec(spriteShoot2, source, playerPos, WHITE);
-					if (!ShotPassed) {
-						DrawTextureRec(bullet2, bulletRec, bullet2Pos, WHITE);
-						bullet2Pos.x -= CellWidth;
-					}
-					if (bullet2Pos.x < 0)
-					{
-						bullet2Pos.x = playerPos.x - CellWidth;
-						ShotPassed = 1;
-					}
-				}
-				else
-					IsShooting = 0;
-			}
-		}
-		else if (IsFacingRight && IsFalling)
-			DrawTextureRec(spriteJumpR, sourceJump, playerPos, WHITE);
-		else if (!IsFacingRight && IsFalling)
-			DrawTextureRec(spriteJumpL, sourceJump, playerPos, WHITE);
-		else if (IsFacingRight && IsFalling == 0)
-			DrawTextureRec(spritePlayerR, source, playerPos, WHITE);
-		else if (!IsFacingRight && IsFalling == 0)
-			DrawTextureRec(spritePlayerL, sourceL, playerPos, WHITE);
-
-		DrawTextureRec(bush, BushRec, BushPos, WHITE);
-
-		UpdateHealth();
-
-		DrawTextureRec(hearts, sourceH, (Vector2{ 20, 0 }), WHITE);
-
-		if (screenPassed == 10)
-			break;
-		if (Health < 15) {
-			PlaySound(death);
-			break;
-		}
-		EndDrawing();
-	}
-	if (screenPassed < 10)
-		GAMEOVER();
-	FINISH();
-	CloseAudioDevice();
-
-	CloseWindow();
+	MainMenu();
 
 	return 0;
+}
+
+void MainMenu()
+{
+	SetTargetFPS(60);
+	ButtonPlay play = ButtonPlay();
+	ButtonQuit quit = ButtonQuit();
+	MouseClick = LoadSound("audio/click.mp3");
+	bool ShouldQuit = 0;
+	while (!ShouldQuit && !WindowShouldClose())
+	{
+		BeginDrawing();
+		play.Draw();
+		quit.Draw();
+		if (IsMouseButtonPressed(MOUSE_BUTTON_LEFT)) {
+			int x = GetMouseX();
+			int y = GetMouseY();
+			if ((x > SCREENWIDTH / 2 - 75 && y > SCREENHEIGHT / 2 - 75) && (x < SCREENWIDTH / 2 + 75 && y < SCREENHEIGHT / 2 - 25)) {
+				PlaySound(MouseClick);
+				ChooseMap();
+				ShouldQuit = 1;
+			}
+			if ((x > SCREENWIDTH / 2 - 75 && y > SCREENHEIGHT / 2 + 25) && (x < SCREENWIDTH / 2 + 75 && y < SCREENHEIGHT / 2 + 75))
+				ShouldQuit = 1;
+		}
+		ClearBackground(RAYWHITE);
+		EndDrawing();
+	}
+}
+
+void ChooseMap()
+{
+	Map1 CactusRun = Map1();
+	Map2 NightJump = Map2();
+	unsigned short sleepedFor = 0;
+	unsigned short sleep = 5;
+	bool ShouldQuit = 0;
+	while (!ShouldQuit && !WindowShouldClose())
+	{
+		sleepedFor++;
+		BeginDrawing();
+		CactusRun.Draw();
+		NightJump.Draw();
+		if (sleepedFor > sleep && IsMouseButtonPressed(MOUSE_BUTTON_LEFT)) {
+			int x = GetMouseX();
+			int y = GetMouseY();
+			if ((x > SCREENWIDTH / 2 - 130 && y > SCREENHEIGHT / 2 - 75) && (x < SCREENWIDTH / 2 + 170 && y < SCREENHEIGHT / 2 - 25)) {
+				PlaySound(MouseClick);
+				GamePlay();
+				ShouldQuit = 1;
+			}
+			if ((x > SCREENWIDTH / 2 - 130 && y > SCREENHEIGHT / 2 + 25) && (x < SCREENWIDTH / 2 + 170 && y < SCREENHEIGHT / 2 + 75)) {
+				PlaySound(MouseClick);
+				DrawText("ahoj", 0, 0, 50, BLACK);
+				//ShouldQuit = 1;
+			}
+		}
+		ClearBackground(RAYWHITE);
+		EndDrawing();
+	}
+	CloseWindow();
 }
 
 void UpdatePlayer()
@@ -345,6 +311,7 @@ void UpdatePlayer()
 			if (playerPos.x > SCREENWIDTH - CellWidth)
 			{
 				screenPassed++;
+				resetWorld();
 				IsCactusFriendly = 0;
 				playerPos.x = 0;
 				int random = rand() % 3 + 2;
@@ -437,6 +404,174 @@ void UpdateHealth()
 	}
 }
 
+void GamePlay()
+{
+	Music music = LoadMusicStream("audio/everet-almond.mp3");
+	//all music rights reserved to everet almond
+	Sound death = LoadSound("audio/death.wav");
+	hit = LoadSound("audio/hit.mp3");
+	step = LoadSound("audio/step.wav");
+	gunshot = LoadSound("audio/gunshot.mp3");
+	SetSoundVolume(step, 0.35f);
+	SetSoundVolume(death, 0.5f);
+	SetSoundVolume(hit, 0.5f);
+	SetSoundVolume(gunshot, 0.5f);
+	SetMusicVolume(music, 0.5f);
+	PlayMusicStream(music);
+	SetTargetFPS(60);
+	pozadi = LoadTexture("assets/pozadi.png");
+	spritePlayerR = LoadTexture("assets/sprite.png");
+	spritePlayerL = LoadTexture("assets/sprite2.png");
+	hearts = LoadTexture("assets/hearts.png");
+	heartHalf = LoadTexture("assets/heart_half.png");
+	heartPrazdne = LoadTexture("assets/heart_prazdne.png");
+	floorSprite = LoadTexture("assets/floor1.png");
+	spriteJumpR = LoadTexture("assets/spriteJump.png");
+	spriteJumpL = LoadTexture("assets/spriteJump2.png");
+	spriteShoot = LoadTexture("assets/spriteShooting.png");
+	spriteShoot2 = LoadTexture("assets/spriteShooting2.png");
+	bush = LoadTexture("assets/RollingBush2.png");
+	enemyR = LoadTexture("assets/sprite_enemy.png");
+	enemyL = LoadTexture("assets/sprite_enemy2.png");
+	cactus = LoadTexture("assets/cactuslowquality.png");
+	salon = LoadTexture("assets/salon.png");
+	bullet = LoadTexture("assets/bullet.png");
+	bullet2 = LoadTexture("assets/bullet2.png");
+	plank = LoadTexture("assets/plank.png");
+	while (WindowShouldClose() == 0)
+	{
+		UpdateMusicStream(music);
+		++ShotDurationCount;
+		++AnimationDelayCount;
+		++BushAnimationDelayCount;
+		NotMovingCount++;
+		movementCount++;
+
+		BeginDrawing();
+
+		if (BushAnimationDelayCount > BushAnimationDelay)
+		{
+			BushAnimationDelayCount = 0;
+			++rollIndex;
+			rollIndex %= 5;
+			BushRec.x = (float)CellWidth / 2 * (float)rollIndex;
+			BushPos.x += CellWidth / 2;
+			if (BushPos.x > SCREENWIDTH - CellWidth)
+			{
+				++BushNotOnScreenCount;
+				if (BushNotOnScreenCount > BushNotOnScreen) {
+					BushNotOnScreenCount = 0;
+					BushPos.x = 0;
+				}
+			}
+		}
+
+		UpdatePlayer();
+
+		if (IsKeyPressed(KEY_M))
+			SetMusicVolume(music, 0.0f);
+
+		if (IsKeyPressed(KEY_U))
+			SetMusicVolume(music, 0.5f);
+		DrawTexture(pozadi, 0, 0, WHITE);
+
+		DrawTextureRec(floorSprite, FloorRec, (Vector2{ 0, SCREENHEIGHT - 50 }), WHITE);
+
+		DrawTextureRec(cactus, cactusRec, cactusPos, WHITE);
+
+		if (screenPassed == 9) {
+			DrawTextureRec(salon, salonRec, (Vector2{ SCREENWIDTH - CellWidth * 2, SCREENHEIGHT - CellHeight * 2.5 }), WHITE);
+			if (playerPos.x >= SCREENWIDTH - CellWidth && !IsFalling)
+				screenPassed++;
+		}
+		if (IsShooting)
+		{
+			if (IsFacingRight) {
+				if (ShotDuration > ShotDurationCount)
+				{
+					DrawTextureRec(spriteShoot, source, playerPos, WHITE);
+					if (!ShotPassed) {
+						DrawTextureRec(bullet, bulletRec, bulletPos, WHITE);
+						bulletPos.x += CellWidth;
+					}
+					if (bulletPos.x > SCREENWIDTH - CellWidth)
+					{
+						bulletPos.x = playerPos.x + CellWidth;
+						ShotPassed = 1;
+					}
+				}
+				else
+					IsShooting = 0;
+			}
+			if (!IsFacingRight) {
+				if (ShotDuration > ShotDurationCount)
+				{
+					DrawTextureRec(spriteShoot2, source, playerPos, WHITE);
+					if (!ShotPassed) {
+						DrawTextureRec(bullet2, bulletRec, bullet2Pos, WHITE);
+						bullet2Pos.x -= CellWidth;
+					}
+					if (bullet2Pos.x < 0)
+					{
+						bullet2Pos.x = playerPos.x - CellWidth;
+						ShotPassed = 1;
+					}
+				}
+				else
+					IsShooting = 0;
+			}
+		}
+		else if (IsFacingRight && IsFalling)
+			DrawTextureRec(spriteJumpR, sourceJump, playerPos, WHITE);
+		else if (!IsFacingRight && IsFalling)
+			DrawTextureRec(spriteJumpL, sourceJump, playerPos, WHITE);
+		else if (IsFacingRight && IsFalling == 0)
+			DrawTextureRec(spritePlayerR, source, playerPos, WHITE);
+		else if (!IsFacingRight && IsFalling == 0)
+			DrawTextureRec(spritePlayerL, sourceL, playerPos, WHITE);
+
+		DrawTextureRec(bush, BushRec, BushPos, WHITE);
+
+		UpdateHealth();
+
+		DrawTextureRec(hearts, sourceH, (Vector2{ 20, 0 }), WHITE);
+
+		if (screenPassed == 10)
+			break;
+		if (Health < 15) {
+			PlaySound(death);
+			break;
+		}
+		EndDrawing();
+	}
+	UnloadTexture(pozadi);
+	UnloadTexture(spritePlayerR);
+	UnloadTexture(spritePlayerL);
+	UnloadTexture(spriteOpponent);
+	UnloadTexture(floorSprite);
+	UnloadTexture(hearts);
+	UnloadTexture(heartHalf);
+	UnloadTexture(heartPrazdne);
+	UnloadTexture(spriteJumpR);
+	UnloadTexture(spriteJumpL);
+	UnloadTexture(spriteShoot);
+	UnloadTexture(spriteShoot2);
+	UnloadTexture(bush);
+	UnloadTexture(enemyL);
+	UnloadTexture(enemyR);
+	UnloadTexture(cactus);
+	UnloadTexture(salon);
+	UnloadTexture(bullet);
+	UnloadTexture(bullet2);
+	UnloadTexture(plank);
+	if (screenPassed < 10)
+		GAMEOVER();
+	FINISH();
+	CloseAudioDevice();
+
+	CloseWindow();
+}
+
 void drawPlatform()
 {
 	for (int row = 0; row < worldHeight; row++)
@@ -463,5 +598,20 @@ void CheckPlatform()
 	if (!IsFacingRight) {
 		if (GetTile(playerPos.x / 50 + 1, playerPos.y / 50 + 2 - (30 / 50)) == 1)
 			IsFalling = 0;
+	}
+}
+
+void resetWorld()
+{
+	for (int i = 0; i < worldHeight; i++) {
+		if (World[i][worldWidth - 1] == 1) {
+			World[i][0] = World[i][worldWidth - 1];
+			World[i][1] = World[i][worldWidth - 1];
+		}
+	}
+	for (int i = 2; i < worldWidth; i++) {
+		for (int j = 0; j < worldHeight; j++) {
+			World[j][i] = 0;
+		}
 	}
 }
