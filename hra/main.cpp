@@ -20,6 +20,7 @@ unsigned short NotMovingCount = 0;
 const unsigned short ShotDuration = 30;
 unsigned short ShotDurationCount = 0;
 short Health = 100;
+short mapPicked = 0;
 const unsigned short fallVelocity = 15;
 
 const unsigned short BushAnimationDelay = 6;
@@ -93,6 +94,7 @@ Texture2D salon;
 Texture2D bullet;
 Texture2D bullet2;
 Texture2D plank;
+Texture2D tMap1;
 
 Rectangle source = (Rectangle{ 0, 0, CellHeight, CellWidth });
 Rectangle sourceL = (Rectangle{ 0, 0, CellHeight, CellWidth });
@@ -195,14 +197,6 @@ void FINISH()
 void UpdatePlayer();
 void UpdateHealth();
 
-int GetTile();
-
-void CheckPlatform();
-
-void drawPlatform();
-
-void resetWorld();
-
 int main()
 {
 	InitWindow(SCREENWIDTH, SCREENHEIGHT, "2DWESTERN");
@@ -223,6 +217,7 @@ void MainMenu()
 	while (!ShouldQuit && !WindowShouldClose())
 	{
 		BeginDrawing();
+		DrawText("2DWESTERN", 500, 50, 100, BLACK);
 		play.Draw();
 		quit.Draw();
 		if (IsMouseButtonPressed(MOUSE_BUTTON_LEFT)) {
@@ -248,26 +243,32 @@ void ChooseMap()
 	unsigned short sleepedFor = 0;
 	unsigned short sleep = 5;
 	bool ShouldQuit = 0;
+	tMap1 = LoadTexture("assets/Map1.png");
 	while (!ShouldQuit && !WindowShouldClose())
 	{
 		sleepedFor++;
 		BeginDrawing();
-		CactusRun.Draw();
-		NightJump.Draw();
-		if (sleepedFor > sleep && IsMouseButtonPressed(MOUSE_BUTTON_LEFT)) {
-			int x = GetMouseX();
-			int y = GetMouseY();
-			if ((x > SCREENWIDTH / 2 - 130 && y > SCREENHEIGHT / 2 - 75) && (x < SCREENWIDTH / 2 + 170 && y < SCREENHEIGHT / 2 - 25)) {
+		int x = GetMouseX();
+		int y = GetMouseY();
+		if ((x > SCREENWIDTH / 2 - 130 && y > SCREENHEIGHT / 2 - 75) && (x < SCREENWIDTH / 2 + 170 && y < SCREENHEIGHT / 2 - 25)) {
+			DrawTexture(tMap1, 0, 0, WHITE);
+			if (sleepedFor > sleep && IsMouseButtonPressed(MOUSE_BUTTON_LEFT)) {
 				PlaySound(MouseClick);
+				mapPicked = 1;
 				GamePlay();
 				ShouldQuit = 1;
 			}
-			if ((x > SCREENWIDTH / 2 - 130 && y > SCREENHEIGHT / 2 + 25) && (x < SCREENWIDTH / 2 + 170 && y < SCREENHEIGHT / 2 + 75)) {
+		}
+		if ((x > SCREENWIDTH / 2 - 130 && y > SCREENHEIGHT / 2 + 25) && (x < SCREENWIDTH / 2 + 170 && y < SCREENHEIGHT / 2 + 75)) {
+			if (sleepedFor > sleep && IsMouseButtonPressed(MOUSE_BUTTON_LEFT)) {
 				PlaySound(MouseClick);
+				mapPicked = 2;
 				DrawText("ahoj", 0, 0, 50, BLACK);
 				//ShouldQuit = 1;
 			}
 		}
+		CactusRun.Draw();
+		NightJump.Draw();
 		ClearBackground(RAYWHITE);
 		EndDrawing();
 	}
@@ -311,7 +312,6 @@ void UpdatePlayer()
 			if (playerPos.x > SCREENWIDTH - CellWidth)
 			{
 				screenPassed++;
-				resetWorld();
 				IsCactusFriendly = 0;
 				playerPos.x = 0;
 				int random = rand() % 3 + 2;
@@ -419,9 +419,11 @@ void GamePlay()
 	SetMusicVolume(music, 0.5f);
 	PlayMusicStream(music);
 	SetTargetFPS(60);
-	pozadi = LoadTexture("assets/pozadi.png");
+	if (mapPicked == 1)
+		pozadi = LoadTexture("assets/pozadi.png");
 	spritePlayerR = LoadTexture("assets/sprite.png");
 	spritePlayerL = LoadTexture("assets/sprite2.png");
+	cactus = LoadTexture("assets/cactuslowquality.png");
 	hearts = LoadTexture("assets/hearts.png");
 	heartHalf = LoadTexture("assets/heart_half.png");
 	heartPrazdne = LoadTexture("assets/heart_prazdne.png");
@@ -433,7 +435,6 @@ void GamePlay()
 	bush = LoadTexture("assets/RollingBush2.png");
 	enemyR = LoadTexture("assets/sprite_enemy.png");
 	enemyL = LoadTexture("assets/sprite_enemy2.png");
-	cactus = LoadTexture("assets/cactuslowquality.png");
 	salon = LoadTexture("assets/salon.png");
 	bullet = LoadTexture("assets/bullet.png");
 	bullet2 = LoadTexture("assets/bullet2.png");
@@ -570,48 +571,4 @@ void GamePlay()
 	CloseAudioDevice();
 
 	CloseWindow();
-}
-
-void drawPlatform()
-{
-	for (int row = 0; row < worldHeight; row++)
-		for (int col = 0; col < worldWidth; col++)
-		{
-			if (World[row][col] == 1)
-			{
-				DrawTextureRec(plank, plankRec, (Vector2{ (float)col * CellWidth / 2, (float)row * CellHeight / 2 }), WHITE);
-			}
-		}
-}
-
-int GetTile(unsigned row, unsigned col)
-{
-	return World[col][row];
-}
-
-void CheckPlatform()
-{
-	if (IsFacingRight) {
-		if (GetTile(playerPos.x / 50, playerPos.y / 50 + 2 - (30 / 50)) == 1)
-			IsFalling = 0;
-	}
-	if (!IsFacingRight) {
-		if (GetTile(playerPos.x / 50 + 1, playerPos.y / 50 + 2 - (30 / 50)) == 1)
-			IsFalling = 0;
-	}
-}
-
-void resetWorld()
-{
-	for (int i = 0; i < worldHeight; i++) {
-		if (World[i][worldWidth - 1] == 1) {
-			World[i][0] = World[i][worldWidth - 1];
-			World[i][1] = World[i][worldWidth - 1];
-		}
-	}
-	for (int i = 2; i < worldWidth; i++) {
-		for (int j = 0; j < worldHeight; j++) {
-			World[j][i] = 0;
-		}
-	}
 }
