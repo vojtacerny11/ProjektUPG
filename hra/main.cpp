@@ -95,6 +95,7 @@ Texture2D bullet;
 Texture2D bullet2;
 Texture2D plank;
 Texture2D tMap1;
+Texture2D tMap2;
 
 Rectangle source = (Rectangle{ 0, 0, CellHeight, CellWidth });
 Rectangle sourceL = (Rectangle{ 0, 0, CellHeight, CellWidth });
@@ -244,6 +245,7 @@ void ChooseMap()
 	unsigned short sleep = 5;
 	bool ShouldQuit = 0;
 	tMap1 = LoadTexture("assets/Map1.png");
+	tMap2 = LoadTexture("assets/Map1.png"); //musime zmenit na textururu mapy 2
 	while (!ShouldQuit && !WindowShouldClose())
 	{
 		sleepedFor++;
@@ -260,11 +262,14 @@ void ChooseMap()
 			}
 		}
 		if ((x > SCREENWIDTH / 2 - 130 && y > SCREENHEIGHT / 2 + 25) && (x < SCREENWIDTH / 2 + 170 && y < SCREENHEIGHT / 2 + 75)) {
-			if (sleepedFor > sleep && IsMouseButtonPressed(MOUSE_BUTTON_LEFT)) {
-				PlaySound(MouseClick);
-				mapPicked = 2;
-				DrawText("ahoj", 0, 0, 50, BLACK);
-				//ShouldQuit = 1;
+			DrawTexture(tMap2, 0, 0, WHITE);
+			if ((x > SCREENWIDTH / 2 - 130 && y > SCREENHEIGHT / 2 + 25) && (x < SCREENWIDTH / 2 + 170 && y < SCREENHEIGHT / 2 + 75)) {
+				if (sleepedFor > sleep && IsMouseButtonPressed(MOUSE_BUTTON_LEFT)) {
+					PlaySound(MouseClick);
+					mapPicked = 2;
+					GamePlay();
+					ShouldQuit = 1;
+				}
 			}
 		}
 		CactusRun.Draw();
@@ -421,6 +426,8 @@ void GamePlay()
 	SetTargetFPS(60);
 	if (mapPicked == 1)
 		pozadi = LoadTexture("assets/pozadi.png");
+	else //mapPicked == 2
+		pozadi = LoadTexture("assets/pozadi.png"); //musime dat druhe pozadi
 	spritePlayerR = LoadTexture("assets/sprite.png");
 	spritePlayerL = LoadTexture("assets/sprite2.png");
 	cactus = LoadTexture("assets/cactuslowquality.png");
